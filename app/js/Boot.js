@@ -8,7 +8,7 @@ define([
   BootState.prototype = {
     constructor: BootState,
     preload: function() {
-      this.load.image('preloadbar', 'assets/img/preloader-bar.png');
+      this.load.image('preloadbar', 'assets/images/preloader-bar.png');
     },
     create: function() {
       this.game.stage.backgroundColor = '#fff';
