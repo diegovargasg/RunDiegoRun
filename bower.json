@@ -1,0 +1,31 @@
+{
+  "name": "rundiegorun",
+  "version": "0.0.1",
+  "authors": [
+    "diegovargasg <diegodevelopero@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "phaser": "~2.2.0",
+    "requirejs": "~2.1.18"
+  },
+  "description": "The Embassy Adventures",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "phaser",
+    "game",
+    "html5",
+    "css3",
+    "javascript"
+  ],
+  "homepage": "https://github.com/diegovargasg"
+}
