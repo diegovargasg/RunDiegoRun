@@ -9,6 +9,7 @@ define([
     constructor: GameState,
     preload: function() {
       this.game.time.advancedTiming = true;
+      this.isPlayerRunning = false;
     },
     create: function() {
 
@@ -33,11 +34,10 @@ define([
       //this.player.frame = 24;
       
       this.player.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7], 12, true);
-      
-
-      this.player.animations.add('jump', [0, 1, 2, 3, 4, 5, 6, 7], 10, true);
+      this.player.animations.add('jump', [110, 112, 113, 114, 115], 5, false);
 
       this.player.animations.play('run');
+      this.isPlayerRunning = true;
 
       //enable physics on the player
       this.game.physics.arcade.enable(this.player);
@@ -47,13 +47,38 @@ define([
        
       //the camera will follow the player in the world
       this.game.camera.follow(this.player);
+
+      //  Moves the player with the key arrows
+      this.cursors = this.game.input.keyboard.createCursorKeys();
     },
     update: function() {
       this.game.physics.arcade.collide(this.player, this.blockedLayer, this.playerHit, null, this);
+
+      // Jump Detection
+      //this.player.body.velocity.x = 300; 
+      if(this.cursors.up.isDown) {
+          this.playerJump();
+      }
     },
     render: function(){
-      this.game.debug.text(this.game.time.fps || '--', 20, 70, "#00ff00", "40px Courier");  
-      this.game.debug.bodyInfo(this.player, 0, 80);   
+      //this.game.debug.text(this.game.time.fps || '--', 20, 70, "#00ff00", "40px Courier");  
+      //this.game.debug.bodyInfo(this.player, 0, 80);   
+    },
+    playerHit: function(player, blockedLayer) {
+      //console.log('hir');
+      if(this.isPlayerRunning === false){
+        this.player.animations.stop('jump');
+        this.player.animations.play('run');
+        this.isPlayerRunning = true;
+      }
+    },
+    playerJump: function(){
+      if(this.player.body.blocked.down) {
+        this.player.animations.stop('run');
+        this.player.animations.play('jump');
+        this.isPlayerRunning = false;
+        this.player.body.velocity.y -= 600;
+      }   
     }
   };
 
