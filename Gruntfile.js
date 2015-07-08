@@ -19,7 +19,7 @@ module.exports = function(grunt) {
 		watch: {
 	    livereload: {
         options: {livereload: true},
-        files: ['app/index.html', 'app/css/*.css', 'app/js/*.js'],
+        files: ['app/index.html', 'app/css/*.css', 'app/js/*.js', 'assets/tilemaps/*.json'],
       },
 	  },
 	  connect: {

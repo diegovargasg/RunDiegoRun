@@ -7,7 +7,7 @@ requirejs.config({
       }
     },
     paths: {
-        phaser: '../bower_components/phaser/build/phaser',
+        phaser: '../bower_components/phaser/build/phaser.min',
     }
 });
 

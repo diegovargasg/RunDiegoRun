@@ -10,10 +10,18 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "tests",
+    "src",
+    "examples",
+    "docs",
+    "docgen",
+    "resources",
+    "tasks",
+    "plugins",
+    "filters"
   ],
   "dependencies": {
-    "phaser": "~2.2.0",
+    "phaser": "~2.0",
     "requirejs": "~2.1.18"
   },
   "description": "The Embassy Adventures",
