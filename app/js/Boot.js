@@ -14,7 +14,7 @@ define([
       this.game.stage.backgroundColor = '#fff';
 
       //scaling options
-      this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+      this.scale.scaleMode = Phaser.ScaleManager.NONE;
  
       //have the game centered horizontally
       this.scale.pageAlignHorizontally = true;

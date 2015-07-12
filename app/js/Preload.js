@@ -14,13 +14,18 @@ define([
       this.load.setPreloadSprite(this.preloadBar);
    
       //load game assets
-      this.load.tilemap('level1', 'assets/tilemaps/tiles.json', null, Phaser.Tilemap.TILED_JSON);
-      this.load.image('gameTiles', 'assets/images/tiles_spritesheet.png');
       this.load.spritesheet('player', 'assets/images/player.png', 80, 80);
-      this.load.image('playerDuck', 'assets/images/player_duck.png');
-      this.load.image('playerDead', 'assets/images/player_dead.png');
-      this.load.image('goldCoin', 'assets/images/goldCoin.png');
-      this.load.audio('coin', 'assets/audio/coin.wav');
+      this.load.image('ground', 'assets/images/ground.jpg');
+      this.load.image('sky', 'assets/images/sky.jpg');
+
+      //////
+      // TODO: use sprite sheets //
+      //////
+      this.load.image('diploma', 'assets/images/diploma.png');
+      this.load.image('passport', 'assets/images/passport.png');
+      this.load.image('suitcase', 'assets/images/suitcase.png');
+      this.load.image('umbrella', 'assets/images/umbrella.png');
+      this.load.image('barrel', 'assets/images/barrel.png');
     },
     create: function() {
       this.state.start('Game');
