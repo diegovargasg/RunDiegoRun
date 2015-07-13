@@ -17,6 +17,8 @@ define([
       this.load.spritesheet('player', 'assets/images/player.png', 80, 80);
       this.load.image('ground', 'assets/images/ground.jpg');
       this.load.image('sky', 'assets/images/sky.jpg');
+      this.load.image('background-city', 'assets/images/background-city.png');
+      this.load.image('background-forest', 'assets/images/background-forest.png');
 
       //////
       // TODO: use sprite sheets //
@@ -26,6 +28,7 @@ define([
       this.load.image('suitcase', 'assets/images/suitcase.png');
       this.load.image('umbrella', 'assets/images/umbrella.png');
       this.load.image('barrel', 'assets/images/barrel.png');
+      this.load.spritesheet('sheep', 'assets/images/sheep.png', 100, 62);
     },
     create: function() {
       this.state.start('Game');
