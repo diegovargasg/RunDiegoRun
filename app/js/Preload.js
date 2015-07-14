@@ -28,6 +28,7 @@ define([
       this.load.image('suitcase', 'assets/images/suitcase.png');
       this.load.image('umbrella', 'assets/images/umbrella.png');
       this.load.image('barrel', 'assets/images/barrel.png');
+      this.load.image('block-wall', 'assets/images/block-wall.png');
       this.load.spritesheet('sheep', 'assets/images/sheep.png', 100, 62);
     },
     create: function() {

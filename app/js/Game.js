@@ -25,8 +25,10 @@ define([
       this.backgroundForest.fixedToCamera = true;
 
       this.ground = this.game.add.tileSprite(0, 280, 640,  40, 'ground');
-      this.ground = this.game.add.tileSprite(0, 280, 640,  40, 'ground');
       this.ground.fixedToCamera = true;
+
+      // Blocking Groups
+      this.blockGroup = this.game.add.group();
 
     },
     createPlayer: function(){
@@ -41,6 +43,10 @@ define([
       this.game.camera.follow(this.player);
       this.player.anchor.setTo(1, 1);
 
+      this.blockWood = this.game.add.tileSprite(this.game.width, 180, 320, 40, 'block-wall');
+      this.blockGroup.add(this.blockWood);
+      this.blockGroup.add(this.ground);
+      
       /*this.sheep = this.game.add.sprite(500, 237, 'sheep');
       this.sheep.scale.set(0.7, 0.7);
       this.sheep.animations.add('run', [0, 1, 2], 7, true);
@@ -116,13 +122,15 @@ define([
       this.createPlayer();
       this.createObjects();
 
-      this.game.physics.arcade.enable([this.player, this.ground, this.objects]);
+      this.game.physics.arcade.enable([this.player, this.ground, this.objects, this.blockWood]);
 
       // Set ups collision between player and ground
       this.player.body.gravity.y = 1000;
 
       this.ground.body.immovable = true;
       this.ground.body.collideWorldBounds = true;
+
+      this.blockWood.body.immovable = true;
 
       // Enables Cursor control for the player
       this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -131,8 +139,8 @@ define([
       this.objectsSetTimeMove();
     },
     render: function(){
-      this.game.debug.text(this.game.time.fps || '--', 20, 70, "#00ff00", "40px Courier");  
-      this.game.debug.bodyInfo(this.player, 0, 80);  
+      /*this.game.debug.text(this.game.time.fps || '--', 20, 70, "#00ff00", "40px Courier");  
+      this.game.debug.bodyInfo(this.player, 0, 80);  */
     },
     playerHit: function(player, blockedLayer) {
       
@@ -148,7 +156,7 @@ define([
       }
     },
     playerdock: function(){
-      if( this.playerStatus !== 'docking' ){ console.log('docking');
+      if( this.playerStatus !== 'docking' && this.playerStatus !== 'jumping' ){ console.log('docking');
         this.player.animations.stop('run');
         this.player.animations.stop('jump');
         this.player.animations.play('dock');
@@ -158,7 +166,7 @@ define([
       }
     },
     playerJump: function(){
-      if( this.playerStatus !== 'jumping' ){ console.log('jumping');
+      if( this.playerStatus !== 'jumping' && this.playerStatus !== 'docking' ){ console.log('jumping');
         this.player.animations.stop('run');
         this.player.animations.stop('dock');
         this.player.animations.play('jump');
@@ -171,7 +179,8 @@ define([
       console.log('hit');
     },
     update: function() {
-      this.game.physics.arcade.collide(this.player, this.ground, this.playerRunning, null, this);
+      this.game.physics.arcade.collide(this.player, this.blockGroup, this.playerRunning, null, this);
+      // this.game.physics.arcade.collide(this.player, this.blockWood);
 
       // Jump Detection & dock detection
       if(this.cursors.up.isDown) {
@@ -184,11 +193,17 @@ define([
       this.backgroundCity.tilePosition.x -= 0.1;
       this.backgroundForest.tilePosition.x -= 0.2;
 
+      this.blockWood.body.x -= 1;
+
       //restart the game if reaching the edge
       /*if(this.player.x >= this.game.world.width) {
         this.game.state.start('Game');
       }*/
       
+      if(this.blockWood.x < -this.blockWood.width) {
+        this.blockWood.body.x = this.game.width;
+      }
+
       // Move Active Objects
       for (var i = 0; i < this.objects.length; i++) {
         if( this.objects[i].status === 'active' ){
