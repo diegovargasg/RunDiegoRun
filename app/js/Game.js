@@ -28,7 +28,7 @@ define([
       this.backgroundCity.scale.set(0.65, 0.65);
       this.backgroundCity.fixedToCamera = true;
 
-      this.backgroundForest = this.game.add.tileSprite(0, 142, 1517,  148, 'background-forest');
+      this.backgroundForest = this.game.add.tileSprite(0, 142, 1116,  148, 'background-forest');
       this.backgroundForest.fixedToCamera = true;
 
       this.ground = this.game.add.tileSprite(0, 280, 640,  40, 'ground');
@@ -39,13 +39,20 @@ define([
 
       // Ground Groups
       this.groundGroup = this.game.add.group();
+      
+      // Energy Bar
+      this.energyBar = this.game.add.graphics(10, 10);
+      this.energyBar.beginFill(0xCC433C, 1);
+      this.energyBar.drawRect(0, 0, 150, 20);
+      // Energy Bar Frame
+      this.eneryBarFrame = this.game.add.sprite(10, 10, 'energy-bar');
 
     },
     createEnegyLevel: function(){
       var text = 100;
-      var style = { font: "28px Arial", fill: "#ff0044", align: "center" };
+      var style = { font: "12px Arial", fill: "#ffffff", align: "center" };
 
-      this.t = this.game.add.text(this.game.world.centerX-300, 0, text, style);
+      this.energyBarText = this.game.add.text(75, 13, text, style);
     },
     updateEnergyLevel: function(){
 
@@ -196,14 +203,14 @@ define([
         this.player.animations.stop('run');
         this.player.animations.stop('dock');
         this.player.animations.play('jump');
-        this.player.body.velocity.y -= 550;
+        this.player.body.velocity.y -= 555;
 
         this.playerStatus = 'jumping';
       }
     },
-    playerHurted: function(){
-      // console.log('playerHurted');
-      this.t.text -= 1;
+    playerHurted: function(){ console.log(this.energyBarText);
+      this.energyBarText.text -= 1;
+      this.energyBar.scale.x = (this.energyBarText.text/100);
     },
     update: function() {
       this.game.physics.arcade.collide(this.player, this.groundGroup, this.playerRunning, null, this);
@@ -216,7 +223,7 @@ define([
         this.playerdock();
       }
 
-      this.ground.tilePosition.x -= 1;
+      this.ground.tilePosition.x -= 1.1;
       this.backgroundCity.tilePosition.x -= 0.1;
       this.backgroundForest.tilePosition.x -= 0.2;
 
@@ -227,6 +234,11 @@ define([
         this.game.state.start('Game');
       }*/
       
+      // If energy is over
+      if(this.energyBarText.text <= 0) {
+        this.game.state.start('Game');
+      }
+
       if(this.blockWood.x < -this.blockWood.width) {
         this.blockWood.body.x = this.game.width;
       }
@@ -240,7 +252,7 @@ define([
           }else if( this.obstacles[i].type === 'animated' ){ //console.log('animated');
             this.obstacles[i].obstacle.x -= this.obstacles[i].speed;
           }else{
-            this.obstacles[i].obstacle.x -= 2.5;
+            this.obstacles[i].obstacle.x -= 3;
           }
         }
 
