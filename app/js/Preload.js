@@ -14,7 +14,7 @@ define([
       this.load.setPreloadSprite(this.preloadBar);
    
       //load game assets
-      this.load.spritesheet('player', 'assets/images/player.png', 80, 80);
+      this.load.spritesheet('player', 'assets/images/playerv2.png', 80, 74);
       this.load.image('ground', 'assets/images/ground.jpg');
       this.load.image('sky', 'assets/images/sky.jpg');
       this.load.image('background-city', 'assets/images/background-city.png');

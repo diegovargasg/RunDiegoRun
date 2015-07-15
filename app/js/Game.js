@@ -54,15 +54,16 @@ define([
       //create player
       this.player = this.game.add.sprite(200, 0, 'player');
 
-      this.player.animations.add('run', [0, 1, 2, 3, 4, 5, 6, 7, 8], 12, true);
-      this.player.animations.add('jump', [110, 112, 113, 114, 115], 5, false);
-      this.player.animations.add('dock', [17, 18, 19, 20, 21, 22, 23], 15, true);
+      this.player.animations.add('run', [9, 10, 11, 12, 13, 14, 15, 16, 17], 12, true);
+      this.player.animations.add('jump', [0, 1, 2, 3, 4, 5, 6, 7], 5, false);
+      this.player.animations.add('dock', [19, 20, 21, 22, 23, 24], 15, true);
+
       this.player.standDimensions = {width: this.player.width, height: this.player.height};
       this.player.dockedDimensions = {width: this.player.standDimensions.width, height: this.player.standDimensions.height/2};
       this.game.camera.follow(this.player);
       this.player.anchor.setTo(1, 1);
 
-      this.blockWood = this.game.add.tileSprite(this.game.width, 160, 320, 40, 'block-wall');
+      this.blockWood = this.game.add.tileSprite(this.game.width, 170, 320, 40, 'block-wall');
       this.groundGroup.add(this.blockWood);
       this.groundGroup.add(this.ground);
 
