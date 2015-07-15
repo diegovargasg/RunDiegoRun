@@ -19,6 +19,7 @@ define([
       this.load.image('sky', 'assets/images/sky.jpg');
       this.load.image('background-city', 'assets/images/background-city.png');
       this.load.image('background-forest', 'assets/images/background-forest.png');
+      this.load.image('heart', 'assets/images/heart.png');
 
       //////
       // TODO: use sprite sheets //
@@ -29,6 +30,8 @@ define([
       this.load.image('umbrella', 'assets/images/umbrella.png');
       this.load.image('barrel', 'assets/images/barrel.png');
       this.load.image('block-wall', 'assets/images/block-wall.png');
+      this.load.image('block-wood', 'assets/images/block-wood.png');
+      this.load.image('heart', 'assets/images/heart.png', 40, 40);
       this.load.spritesheet('sheep', 'assets/images/sheep.png', 100, 62);
     },
     create: function() {
