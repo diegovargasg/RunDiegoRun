@@ -15,7 +15,8 @@ define([
     constructor: GameState,
     preload: function() {
       this.game.time.advancedTiming = true;
-      this.conf = {minobstacleInterval: 1000, maxobstacleInterval: 3000};
+      this.confObstacles = {minobstacleInterval: 1000, maxobstacleInterval: 3000};
+      this.confBlocks = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
 
       // Background Group - Controles z-indexing as well
       this.backgroundGroup = this.game.add.group();
@@ -87,45 +88,87 @@ define([
       // Physics enabled to the player
       this.game.physics.arcade.enable(this.player);
       this.player.body.gravity.y = 1000;
-
-      /*this.blockWood = this.game.add.tileSprite(this.game.width, 170, 320, 40, 'block-wall');
-      this.groundGroup.add(this.blockWood);
-      this.groundGroup.add(this.ground);*/
-
     },
     createBlocks: function(){
 
       this.blocks = [];
 
       this.blocksFixed = [{
-                          block:'barrel', 
-                          pos: 231, 
-                          speed: 1.1
-                        }];
-                              
+                            block:'barrel', 
+                            pos: 231, 
+                            speed: 1.1
+                          }];
+
+      this.blocksPattern = [{
+                            block:'block-wood', 
+                            maxNum: 5,
+                            speed: 1.1,
+                            blockWidth: 40,
+                            maxPos: 240,
+                            minPos: 120
+                          },
+                          {
+                            block:'block-wall', 
+                            maxNum: 2,
+                            speed: 1.1,
+                            blockWidth: 40,
+                            maxPos: 240,
+                            minPos: 120
+                          }];
+
+      for (var i = 0; i < this.blocksPattern.length; i++){
+
+        var numEl = Math.floor((Math.random() * (this.blocksPattern[i].maxNum)) + 1);
+        var maxY = Math.floor((Math.random() * (this.blocksPattern[i].maxNum)) + 1);
+
+        var elIndex = this.blocks.push({
+          // X, Y, width, Height
+          block: this.game.add.tileSprite( this.game.width, 0, (this.blocksPattern[i].blockWidth * numEl), this.blocksPattern[i].blockWidth, this.blocksPattern[i].block), 
+          status: 'noactive', 
+          type: 'pattern',
+          speed: this.blocksPattern[i].speed,
+          maxPos: this.blocksPattern[i].maxPos,
+          minPos: this.blocksPattern[i].minPos
+        })-1;
+        this.groundGroup.add(this.blocks[elIndex].block);
+        // Physics enabled for ground to work as floor
+        this.game.physics.arcade.enable(this.blocks[elIndex].block);
+        this.blocks[elIndex].block.body.immovable = true;
+      };
+      
       for (var i = 0; i < this.blocksFixed.length; i++) {
+
           this.blocksFixed[i];
-          this.blocks.push({block: this.game.add.sprite(this.game.width, this.blocksFixed[i].pos, this.blocksFixed[i].block), status: 'noactive', pos: this.blocksFixed[i].pos, type: 'fixed'});
-          this.groundGroup.add(this.blocks[i].block);
+          var elIndex = this.blocks.push({
+            block: this.game.add.sprite(this.game.width, this.blocksFixed[i].pos, this.blocksFixed[i].block), 
+            status: 'noactive', 
+            pos: this.blocksFixed[i].pos, 
+            type: 'fixed',
+            speed: this.blocksFixed[i].speed
+          })-1;
+
+          this.groundGroup.add(this.blocks[elIndex].block);
           // Physics enabled for ground to work as floor
-          this.game.physics.arcade.enable(this.blocks[i].block);
-          this.blocks[i].block.body.immovable = true;
-          // this.ground.body.collideWorldBounds = true;
-      };    
+          this.game.physics.arcade.enable(this.blocks[elIndex].block);
+          this.blocks[elIndex].block.body.immovable = true;
+      };
     },
     blocksSetMovement: function(){
-      var i = (Math.random() * (this.conf.maxobstacleInterval - this.conf.minobstacleInterval + 1)) + this.conf.minobstacleInterval;
-      var h = (Math.random() * (200 - 160 + 1)) + 160;
-      var j = Math.floor(Math.random() * (this.blocks.length));
-
+      var timeInt = (Math.random() * (this.confBlocks.maxobstacleInterval - this.confBlocks.minobstacleInterval + 1)) + this.confBlocks.minobstacleInterval;
+      var indexBlock = Math.floor(Math.random() * (this.blocks.length));
+      
       var self = this;
+
       setTimeout(function(){
-        self.blocks[j].status = 'active';
-        if( self.blocks[j].type === 'random' ){
-          self.blocks[j].block.y = h;
+        self.blocks[indexBlock].status = 'active';
+
+        if( self.blocks[indexBlock].type === 'pattern' ){
+          var posY = Math.floor(Math.random() * (self.blocks[indexBlock].maxPos - self.blocks[indexBlock].minPos + 1)) + self.blocks[indexBlock].minPos;
+          self.blocks[indexBlock].block.y = posY;          
         }
+
         self.blocksSetMovement();
-      }, i);
+      }, timeInt);
     },
     createobstacles: function(){
 
@@ -187,9 +230,9 @@ define([
 
     },
     obstaclesSetTimeMove: function(){
-      var i = (Math.random() * (this.conf.maxobstacleInterval - this.conf.minobstacleInterval + 1)) + this.conf.minobstacleInterval;
-      var h = (Math.random() * (200 - 160 + 1)) + 160;
-      var j = Math.floor(Math.random() * (this.obstacles.length));  
+      var timeInt = (Math.random() * (this.confObstacles.maxobstacleInterval - this.confObstacles.minobstacleInterval + 1)) + this.confObstacles.minobstacleInterval;
+      var positionY = (Math.random() * (240 - 160 + 1)) + 160;
+      var indexObstacle = Math.floor(Math.random() * (this.obstacles.length));  
 
       /*do{
         var j = Math.floor(Math.random() * (this.obstacles.length));  
@@ -197,12 +240,12 @@ define([
 
       var self = this;
       setTimeout(function(){
-        self.obstacles[j].status = 'active';
-        if( self.obstacles[j].type === 'random' ){
-          self.obstacles[j].obstacle.y = h;
+        self.obstacles[indexObstacle].status = 'active';
+        if( self.obstacles[indexObstacle].type === 'random' ){
+          self.obstacles[indexObstacle].obstacle.y = positionY;
         }
         self.obstaclesSetTimeMove();
-      }, i);
+      }, timeInt);
     },
     create: function() {
 
@@ -250,15 +293,18 @@ define([
         this.player.animations.stop('run');
         this.player.animations.stop('dock');
         this.player.animations.play('jump');
-        this.player.body.velocity.y -= 555;
+        this.player.body.velocity.y -= 560;
 
         this.playerStatus = 'jumping';
       }
     },
-    playerHurted: function(){ console.log(this.energyBarText);
+    playerHurted: function(){
       this.energyBarText.text -= 1;
       this.energyBar.scale.x = (this.energyBarText.text/100);
     },
+    endOfGame: function(){
+      // TODO: clear timeIntervals
+    },  
     update: function() {
       this.game.physics.arcade.collide(this.player, this.groundGroup, this.playerRunning, null, this);
       this.game.physics.arcade.overlap(this.player, this.damagingGroup, this.playerHurted, null, this);
@@ -288,25 +334,17 @@ define([
       // Move Active Blocks
       for (var i = 0; i < this.blocks.length; i++) {
         if( this.blocks[i].status === 'active' ){
-
-          if( this.blocks[i].type === 'fixed' ){
-            this.blocks[i].block.x -= 1.1;
-          }else if( this.blocks[i].type === 'animated' ){ //console.log('animated');
-            this.blocks[i].block.x -= this.blocks[i].speed;
-          }else{
-            this.blocks[i].block.x -= 3;
-          }
+          this.blocks[i].block.x -= this.blocks[i].speed;
         }
 
-        if(this.blocks[i].block.x < -40) {
+        if(this.blocks[i].block.x < -this.blocks[i].block.width) {
           this.blocks[i].status = 'noactive';
           this.blocks[i].block.x = this.game.width;
         }
       };
 
-
       // Move Active obstacles
-      /*for (var i = 0; i < this.obstacles.length; i++) {
+      for (var i = 0; i < this.obstacles.length; i++) {
         if( this.obstacles[i].status === 'active' ){
 
           if( this.obstacles[i].type === 'fixed' ){
@@ -322,7 +360,7 @@ define([
           this.obstacles[i].status = 'noactive';
           this.obstacles[i].obstacle.x = this.game.width;
         }
-      };*/
+      };
     }
   };
 
