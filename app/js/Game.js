@@ -16,7 +16,8 @@ define([
     preload: function() {
       this.game.time.advancedTiming = true;
       this.confObstacles = {minobstacleInterval: 1000, maxobstacleInterval: 3000};
-      this.confBlocks = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
+      // this.confBlocks = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
+      this.confBlocks = {minobstacleInterval: 1000, maxobstacleInterval: 2000};
 
       // Background Group - Controles z-indexing as well
       this.backgroundGroup = this.game.add.group();
@@ -26,6 +27,9 @@ define([
 
       // Damaging Group - Controles z-indexing as well
       this.damagingGroup = this.game.add.group();
+
+      // Jump & Dock Timer Control
+      this.jumperTime = 0;
     },
     createWorld: function(){
 
@@ -177,12 +181,12 @@ define([
                                 obstacle:'barrel', 
                                 pos: 231, 
                                 speed: -1
-                              },*/
+                              },
                               {
                                 obstacle:'heart', 
                                 pos: '120', 
                                 speed: -1
-                              }];
+                              }*/];
 
       this.obstaclesAnim = [{
                             obstacle:'sheep', 
@@ -230,13 +234,13 @@ define([
 
     },
     obstaclesSetTimeMove: function(){
-      var timeInt = (Math.random() * (this.confObstacles.maxobstacleInterval - this.confObstacles.minobstacleInterval + 1)) + this.confObstacles.minobstacleInterval;
-      var positionY = (Math.random() * (240 - 160 + 1)) + 160;
-      var indexObstacle = Math.floor(Math.random() * (this.obstacles.length));  
-
-      /*do{
-        var j = Math.floor(Math.random() * (this.obstacles.length));  
-      }while( this.obstacles[j].status === 'active');*/
+      var cont = 0;
+      do{
+        var indexObstacle = Math.floor(Math.random() * (this.obstacles.length));  
+        var timeInt = (Math.random() * (this.confObstacles.maxobstacleInterval - this.confObstacles.minobstacleInterval + 1)) + this.confObstacles.minobstacleInterval;
+        var positionY = (Math.random() * (240 - 160 + 1)) + 160;
+        cont++;
+      }while( this.obstacles[indexObstacle].status === 'active' &&  cont < this.obstacles.length);
 
       var self = this;
       setTimeout(function(){
@@ -289,10 +293,11 @@ define([
       }
     },
     playerJump: function(){
-      if( this.playerStatus !== 'jumping' && this.playerStatus !== 'docking' ){ console.log('jumping');
+      if( this.playerStatus !== 'jumping' && this.playerStatus !== 'docking' && this.game.time.now > this.jumperTime ){ console.log('jumping');
         this.player.animations.stop('run');
         this.player.animations.stop('dock');
         this.player.animations.play('jump');
+        this.jumperTime = this.game.time.now + 440;
         this.player.body.velocity.y -= 560;
 
         this.playerStatus = 'jumping';
@@ -319,8 +324,6 @@ define([
       this.ground.tilePosition.x -= 1.1;
       this.backgroundCity.tilePosition.x -= 0.1;
       this.backgroundForest.tilePosition.x -= 0.2;
-
-      // this.blockWood.body.x -= 1;
 
       // If energy is over
       if(this.energyBarText.text <= 0) {
