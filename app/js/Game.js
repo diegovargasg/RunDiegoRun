@@ -15,9 +15,11 @@ define([
     constructor: GameState,
     preload: function() {
       this.game.time.advancedTiming = true;
-      this.confObstacles = {minobstacleInterval: 1000, maxobstacleInterval: 3000};
-      // this.confBlocks = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
-      this.confBlocks = {minobstacleInterval: 1000, maxobstacleInterval: 2000};
+      this.confObstacles = {minobstacleInterval: 2500, maxobstacleInterval: 4500};
+      this.confBlocks = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
+      // this.confTargets = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
+      this.confTargets = {minobstacleInterval: 2000, maxobstacleInterval: 3000};
+      // this.confBlocks = {minobstacleInterval: 1000, maxobstacleInterval: 2000};
 
       // Background Group - Controles z-indexing as well
       this.backgroundGroup = this.game.add.group();
@@ -27,6 +29,9 @@ define([
 
       // Damaging Group - Controles z-indexing as well
       this.damagingGroup = this.game.add.group();
+
+      // Target group - Controles z-Index as well
+      this.targetGroup = this.game.add.group();
 
       // Jump & Dock Timer Control
       this.jumperTime = 0;
@@ -92,6 +97,53 @@ define([
       // Physics enabled to the player
       this.game.physics.arcade.enable(this.player);
       this.player.body.gravity.y = 1000;
+    },
+    createTargetsScore: function(){
+
+      var initialX = 35;
+      this.targetsScore = [];
+
+      for(var i = 0; i < this.targets.length; i++){
+        var index = this.targetsScore.push(this.game.add.sprite( ((this.game.width-initialX) - (initialX*i)), 10, this.targets[i].target.key, this.targets[i].target.frame))-1;
+        this.targetsScore[index].scale.set(0.6, 0.6);
+      }
+    },
+    targetsMove: function(){
+      var cont = 0;
+      do{
+        var indexTarget = Math.floor(Math.random() * (this.targets.length));
+        var timeInt = (Math.random() * (this.confTargets.maxobstacleInterval - this.confTargets.minobstacleInterval + 1)) + this.confTargets.minobstacleInterval;
+        var positionY = (Math.random() * (240 - 160 + 1)) + 160;
+        cont++;
+      }while( this.targets[indexTarget].status === 'active' &&  cont < this.targets.length);
+
+      var self = this;
+      setTimeout(function(){
+        if( typeof(self.targets[indexTarget]) != 'undefined' ){
+          self.targets[indexTarget].status = 'active';
+          if( self.targets[indexTarget].type === 'random' ){
+            self.targets[indexTarget].target.y = positionY;
+          }
+          self.targetsMove();
+        }
+      }, timeInt);
+    },
+    createTargets: function(){
+      this.targets = [];
+      this.tagetsRandom = ['contract', 'diploma', 'passport'];
+
+      for (var i = 0; i < this.tagetsRandom.length; i++) {
+        var elIndex = this.targets.push({
+                  target: this.game.add.sprite(this.game.width, 0, this.tagetsRandom[i]), 
+                  status: 'noactive', 
+                  type: 'random'
+                }) - 1;
+        this.targetGroup.add(this.targets[elIndex].target);
+        console.log(this.targets[elIndex].target);
+        this.targets[elIndex].target.name = 'target'+elIndex;
+        // Enable collision on the obstacle  
+        this.game.physics.arcade.enable(this.targets[elIndex].target);
+      };
     },
     createBlocks: function(){
 
@@ -176,22 +228,22 @@ define([
     },
     createobstacles: function(){
 
-      this.obstaclesRandom = ['diploma', 'passport', 'suitcase', 'umbrella'];
-      this.obstaclesFixedPos = [/*{
-                                obstacle:'barrel', 
+      this.obstaclesRandom = ['suitcase', 'umbrella'];
+      this.obstaclesFixedPos = [{
+                                obstacle:'cactus', 
                                 pos: 231, 
-                                speed: -1
+                                speed: 1.1
                               },
                               {
-                                obstacle:'heart', 
-                                pos: '120', 
-                                speed: -1
-                              }*/];
+                                obstacle:'snail', 
+                                pos: 242, 
+                                speed: 1.1
+                              }];
 
       this.obstaclesAnim = [{
                             obstacle:'sheep', 
                             pos: 237, 
-                            speed: -1,
+                            speed: 2.5,
                             scale: 0.7,
                             animationName: 'animation',
                             animationFrame: [0, 1, 2],
@@ -201,33 +253,43 @@ define([
       this.obstacles = []
 
       for (var i = 0; i < this.obstaclesAnim.length; i++) {
-        this.obstacles.push({obstacle: this.game.add.sprite(this.game.width, this.obstaclesAnim[i].pos, this.obstaclesAnim[i].obstacle), 
+        var elIndex = this.obstacles.push({obstacle: this.game.add.sprite(this.game.width, this.obstaclesAnim[i].pos, this.obstaclesAnim[i].obstacle), 
                           status: 'noactive', 
                           pos: this.obstaclesAnim[i].pos, 
                           type: 'animated',
-                          speed: 2.5
-                        });
+                          speed: this.obstaclesAnim[i].speed
+                        })-1;
 
-        this.obstacles[i].obstacle.scale.set(this.obstaclesAnim[i].scale);
-        this.obstacles[i].obstacle.animations.add('animation', [0, 1, 2], this.obstaclesAnim[i].animationSpeed, this.obstaclesAnim[i].animationLoop);
-        this.obstacles[i].obstacle.animations.play('animation');
-        this.damagingGroup.add(this.obstacles[i].obstacle);
+        this.obstacles[elIndex].obstacle.scale.set(this.obstaclesAnim[elIndex].scale);
+        this.obstacles[elIndex].obstacle.animations.add('animation', [0, 1, 2], this.obstaclesAnim[elIndex].animationSpeed, this.obstaclesAnim[elIndex].animationLoop);
+        this.obstacles[elIndex].obstacle.animations.play('animation');
+        this.damagingGroup.add(this.obstacles[elIndex].obstacle);
         // Enable collision on the obstacle  
-        this.game.physics.arcade.enable(this.obstacles[i].obstacle);
+        this.game.physics.arcade.enable(this.obstacles[elIndex].obstacle);
       };
 
       for (var i = 0; i < this.obstaclesRandom.length; i++) {
-        this.obstacles.push({obstacle: this.game.add.sprite(this.game.width, 0, this.obstaclesRandom[i]), status: 'noactive', type: 'random'});
-        this.damagingGroup.add(this.obstacles[i].obstacle);
+        var elIndex = this.obstacles.push({
+                  obstacle: this.game.add.sprite(this.game.width, 0, this.obstaclesRandom[i]), 
+                  status: 'noactive', 
+                  type: 'random'
+                }) - 1;
+        this.damagingGroup.add(this.obstacles[elIndex].obstacle);
         // Enable collision on the obstacle  
-        this.game.physics.arcade.enable(this.obstacles[i].obstacle);
+        this.game.physics.arcade.enable(this.obstacles[elIndex].obstacle);
       };
 
       for (var i = 0; i < this.obstaclesFixedPos.length; i++) {
-        this.obstacles.push({obstacle: this.game.add.sprite(this.game.width, this.obstaclesFixedPos[i].pos, this.obstaclesFixedPos[i].obstacle), status: 'noactive', pos: this.obstaclesFixedPos[i].pos, type: 'fixed'});
-        this.damagingGroup.add(this.obstacles[i].obstacle);
+        var elIndex = this.obstacles.push({
+                            obstacle: this.game.add.sprite(this.game.width, this.obstaclesFixedPos[i].pos, this.obstaclesFixedPos[i].obstacle), 
+                            status: 'noactive', 
+                            pos: this.obstaclesFixedPos[i].pos, 
+                            type: 'fixed',
+                            speed: this.obstaclesFixedPos[i].speed
+                          }) - 1;
+        this.damagingGroup.add(this.obstacles[elIndex].obstacle);
         // Enable collision on the obstacle  
-        this.game.physics.arcade.enable(this.obstacles[i].obstacle);
+        this.game.physics.arcade.enable(this.obstacles[elIndex].obstacle);
       };
     },
     obstaclesAssignProb: function(){
@@ -257,13 +319,18 @@ define([
       this.createEnegyLevel();
       this.createobstacles();
       this.createBlocks();
+      this.createTargets();
+      this.createTargetsScore();
       this.createPlayer();
 
       // Starts moving the obstacles
-      this.obstaclesSetTimeMove();
+      // this.obstaclesSetTimeMove();
 
-      // Stasts moving the blocks
-      this.blocksSetMovement();
+      // Starts moving the blocks
+      // this.blocksSetMovement();
+
+      // Starts moving the targets
+      this.targetsMove();
 
       // Enables Cursor control for the player
       this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -309,10 +376,29 @@ define([
     },
     endOfGame: function(){
       // TODO: clear timeIntervals
-    },  
+    },
+    playerHitTarget: function(player, target){
+      for (var i = 0; i < this.targetsScore.length; i++) {
+        if(this.targetsScore[i].key === target.key){
+          this.game.add.sprite(this.targetsScore[i].x, this.targetsScore[i].y, 'check');
+          break;
+        }
+      };
+
+      // Remove it from the targets list so it wont be displayed again
+
+      for (var i = 0; i < this.targets.length; i++) {
+        if(this.targets[i].target.key === target.key){
+          this.targets[i].target.destroy();
+          this.targets.splice(i, 1);
+          break;
+        }
+      };
+    },
     update: function() {
       this.game.physics.arcade.collide(this.player, this.groundGroup, this.playerRunning, null, this);
       this.game.physics.arcade.overlap(this.player, this.damagingGroup, this.playerHurted, null, this);
+      this.game.physics.arcade.overlap(this.player, this.targetGroup, this.playerHitTarget, this.tmp, this);
 
       // Jump Detection & dock detection
       if(this.cursors.up.isDown) {
@@ -351,8 +437,8 @@ define([
         if( this.obstacles[i].status === 'active' ){
 
           if( this.obstacles[i].type === 'fixed' ){
-            this.obstacles[i].obstacle.x -= 1;
-          }else if( this.obstacles[i].type === 'animated' ){ //console.log('animated');
+            this.obstacles[i].obstacle.x -= this.obstacles[i].speed;
+          }else if( this.obstacles[i].type === 'animated' ){
             this.obstacles[i].obstacle.x -= this.obstacles[i].speed;
           }else{
             this.obstacles[i].obstacle.x -= 3;
@@ -362,6 +448,25 @@ define([
         if(this.obstacles[i].obstacle.x < -40) {
           this.obstacles[i].status = 'noactive';
           this.obstacles[i].obstacle.x = this.game.width;
+        }
+      };
+
+      // Move Active Targets
+      for (var i = 0; i < this.targets.length; i++) {
+        if( this.targets[i].status === 'active' ){
+
+          if( this.targets[i].type === 'fixed' ){
+            this.targets[i].target.x -= this.targets[i].speed;
+          }else if( this.targets[i].type === 'animated' ){ //console.log('animated');
+            this.targets[i].target.x -= this.targets[i].speed;
+          }else{
+            this.targets[i].target.x -= 3;
+          }
+        }
+
+        if( this.targets[i].target.x < -(40)) {
+          this.targets[i].status = 'noactive';
+          this.targets[i].target.x = this.game.width;
         }
       };
     }

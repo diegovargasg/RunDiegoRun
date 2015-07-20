@@ -5,8 +5,8 @@ module.exports = function(grunt) {
 	  htmlmin: {                                     // Task 
 	    dist: {                                      // Target 
 	      options: {                                 // Target options 
-	        removeComments: true,
-	        collapseWhitespace: true
+	        removeComments: false,
+	        collapseWhitespace: false
 	      },
 	      files: {                                   // Dictionary of files 
 	        'dist/index.html': 'app/index.html',     // 'destination': 'source' 
@@ -35,7 +35,29 @@ module.exports = function(grunt) {
           }
 	      }
 	    }
-	  }
+	  },
+	  imagemin: {
+	  	dist: {
+		    files: [{
+		        expand: true,
+		        cwd: 'app/assets/images',
+		        src: '{,*/}*.{png,jpg,jpeg}',
+		        dest: 'dist/assets/images'
+		    }]
+	    }	
+	  },
+	  requirejs: {
+		  compile: {
+		    options: {
+          baseUrl: "app/js",
+          out: 'dist/js/main.js',
+          mainConfigFile: "app/js/main.js",
+          name: '../../bower_components/almond/almond',
+          include: 'main',
+          optimize: 'none'
+		    }
+		  }
+		}
 	});
 
 	/////////////////
@@ -46,15 +68,16 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-htmlmin');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-contrib-requirejs');
+	grunt.loadNpmTasks('grunt-contrib-imagemin');
 
 	// Not implemented yet
 	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-requirejs');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 
 	grunt.registerTask('default', ['htmlmin']);
-	grunt.registerTask('build', ['clean', 'htmlmin']);
+	grunt.registerTask('build', ['clean', 'htmlmin', 'imagemin', 'requirejs']);
 	grunt.registerTask('serve', ['connect', 'watch']);
 
 };

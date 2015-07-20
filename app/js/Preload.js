@@ -27,9 +27,13 @@ define([
       //////
       this.load.image('diploma', 'assets/images/diploma.png');
       this.load.image('passport', 'assets/images/passport.png');
+      this.load.image('check', 'assets/images/check.png');
       this.load.image('suitcase', 'assets/images/suitcase.png');
       this.load.image('umbrella', 'assets/images/umbrella.png');
       this.load.image('barrel', 'assets/images/barrel.png');
+      this.load.image('cactus', 'assets/images/cactus.png');
+      this.load.image('snail', 'assets/images/snail.png');
+      this.load.image('contract', 'assets/images/contract.png');
       this.load.image('block-wall', 'assets/images/block-wall.png');
       this.load.image('block-wood', 'assets/images/block-wood.png');
       this.load.image('heart', 'assets/images/heart.png', 40, 40);
