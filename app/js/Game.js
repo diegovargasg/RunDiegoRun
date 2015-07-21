@@ -135,13 +135,14 @@ define([
     },
     createTargets: function(){
       this.targets = [];
-      this.tagetsRandom = ['contract', 'diploma', 'passport'];
+      this.tagetsRandom = [{target: 'contract', desc: 'Work Contract'}, {target: 'diploma', desc: 'Diploma'}, {target: 'passport', desc: 'Valid Passport'}];
 
       for (var i = 0; i < this.tagetsRandom.length; i++) {
         var elIndex = this.targets.push({
-                  target: this.game.add.sprite(this.game.width, 0, this.tagetsRandom[i]), 
+                  target: this.game.add.sprite(this.game.width, 0, this.tagetsRandom[i].target), 
                   status: 'noactive', 
-                  type: 'random'
+                  type: 'random',
+                  desc: this.tagetsRandom[i].desc
                 }) - 1;
         this.targetGroup.add(this.targets[elIndex].target);
         this.targets[elIndex].target.name = 'target'+elIndex;
@@ -431,6 +432,22 @@ define([
       this.game.state.start('Game');    
     },
     endOfGame: function(){
+      var text = this.game.add.text(this.game.world.centerX, this.game.world.centerY-65, 'You\'ve lost.');
+
+      //  Center align
+      text.anchor.set(0.5);
+      text.align = 'center';
+
+      //  Font style
+      text.font = 'Arial';
+      text.fontSize = 40;
+      text.fontWeight = '300';
+
+      //  Stroke color and thickness
+      text.stroke = '#000';
+      text.strokeThickness = 5;
+      text.fill = '#fff';
+
       this.player.animations.stop();
       clearTimeout(this.targetsMoveTimeout);
       clearTimeout(this.obstaclesSetTimeMoveTimeout);
@@ -469,6 +486,28 @@ define([
       // Remove it from the targets list so it wont be displayed again
       for (var i = 0; i < this.targets.length; i++) {
         if(this.targets[i].target.key === target.key){
+          console.log(this.targets[i].desc);
+
+          var text = this.game.add.text(this.game.world.centerX, this.game.world.centerY-65, this.targets[i].desc);
+
+          //  Center align
+          text.anchor.set(0.5);
+          text.align = 'center';
+
+          //  Font style
+          text.font = 'Arial';
+          text.fontSize = 40;
+          text.fontWeight = '300';
+
+          //  Stroke color and thickness
+          text.stroke = '#000';
+          text.strokeThickness = 5;
+          text.fill = '#fff';
+          text.alpha = 1;
+
+          // Animate Text
+          this.game.add.tween(text).to( { alpha: 0 }, 1500, Phaser.Easing.Linear.None, true);
+
           this.targets[i].target.destroy();
           this.targets.splice(i, 1);
           break;
