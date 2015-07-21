@@ -17,9 +17,7 @@ define([
       this.game.time.advancedTiming = true;
       this.confObstacles = {minobstacleInterval: 2500, maxobstacleInterval: 4500};
       this.confBlocks = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
-      // this.confTargets = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
-      this.confTargets = {minobstacleInterval: 2000, maxobstacleInterval: 3000};
-      // this.confBlocks = {minobstacleInterval: 1000, maxobstacleInterval: 2000};
+      this.confTargets = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
 
       // Background Group - Controles z-indexing as well
       this.backgroundGroup = this.game.add.group();
@@ -83,9 +81,9 @@ define([
     },
     createPlayer: function(){
       //create player
-      this.player = this.game.add.sprite(200, 0, 'player');
+      this.player = this.game.add.sprite(150, 0, 'player');
 
-      this.player.animations.add('run', [9, 10, 11, 12, 13, 14, 15, 16, 17], 12, true);
+      this.player.animations.add('run', [9, 10, 11, 12, 13, 14, 15, 16, 17], 15, true);
       this.player.animations.add('jump', [0, 1, 2, 3, 4, 5, 6, 7], 5, false);
       this.player.animations.add('dock', [19, 20, 21, 22, 23, 24], 15, true);
 
@@ -139,7 +137,6 @@ define([
                   type: 'random'
                 }) - 1;
         this.targetGroup.add(this.targets[elIndex].target);
-        console.log(this.targets[elIndex].target);
         this.targets[elIndex].target.name = 'target'+elIndex;
         // Enable collision on the obstacle  
         this.game.physics.arcade.enable(this.targets[elIndex].target);
@@ -152,13 +149,13 @@ define([
       this.blocksFixed = [{
                             block:'barrel', 
                             pos: 231, 
-                            speed: 1.1
+                            speed: 1.5
                           }];
 
       this.blocksPattern = [{
                             block:'block-wood', 
                             maxNum: 5,
-                            speed: 1.1,
+                            speed: 1.5,
                             blockWidth: 40,
                             maxPos: 240,
                             minPos: 120
@@ -166,7 +163,7 @@ define([
                           {
                             block:'block-wall', 
                             maxNum: 2,
-                            speed: 1.1,
+                            speed: 1.5,
                             blockWidth: 40,
                             maxPos: 240,
                             minPos: 120
@@ -232,18 +229,18 @@ define([
       this.obstaclesFixedPos = [{
                                 obstacle:'cactus', 
                                 pos: 231, 
-                                speed: 1.1
+                                speed: 1.5
                               },
                               {
                                 obstacle:'snail', 
                                 pos: 242, 
-                                speed: 1.1
+                                speed: 1.5
                               }];
 
       this.obstaclesAnim = [{
                             obstacle:'sheep', 
                             pos: 237, 
-                            speed: 2.5,
+                            speed: 2.7,
                             scale: 0.7,
                             animationName: 'animation',
                             animationFrame: [0, 1, 2],
@@ -324,10 +321,10 @@ define([
       this.createPlayer();
 
       // Starts moving the obstacles
-      // this.obstaclesSetTimeMove();
+      this.obstaclesSetTimeMove();
 
       // Starts moving the blocks
-      // this.blocksSetMovement();
+      this.blocksSetMovement();
 
       // Starts moving the targets
       this.targetsMove();
@@ -407,7 +404,7 @@ define([
         this.playerdock();
       }
 
-      this.ground.tilePosition.x -= 1.1;
+      this.ground.tilePosition.x -= 1.5;
       this.backgroundCity.tilePosition.x -= 0.1;
       this.backgroundForest.tilePosition.x -= 0.2;
 
@@ -441,7 +438,7 @@ define([
           }else if( this.obstacles[i].type === 'animated' ){
             this.obstacles[i].obstacle.x -= this.obstacles[i].speed;
           }else{
-            this.obstacles[i].obstacle.x -= 3;
+            this.obstacles[i].obstacle.x -= 3.5;
           }
         }
 
