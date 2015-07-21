@@ -1,7 +1,7 @@
 define([
   'phaser',
 ], function (phaser) {
-
+  'use strict';
   //////
   ///ELEMENTS DESCRIPTION
   // Blocks: physics elements where the player is able to walk and jump. No damage is caused on collapsing  //
@@ -16,8 +16,9 @@ define([
     preload: function() {
       this.game.time.advancedTiming = true;
       this.confObstacles = {minobstacleInterval: 2500, maxobstacleInterval: 4500};
-      this.confBlocks = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
-      this.confTargets = {minobstacleInterval: 6000, maxobstacleInterval: 12000};
+      this.confBlocks = {minobstacleInterval: 10000, maxobstacleInterval: 15000};
+      this.confTargets = {minobstacleInterval: 15000, maxobstacleInterval: 30000};
+      this.confPower = {minobstacleInterval: 15000, maxobstacleInterval: 30000};
 
       // Background Group - Controles z-indexing as well
       this.backgroundGroup = this.game.add.group();
@@ -30,6 +31,9 @@ define([
 
       // Target group - Controles z-Index as well
       this.targetGroup = this.game.add.group();
+
+      // Powerups group - Controles z-Index as well
+      this.powerUpGroup = this.game.add.group();
 
       // Jump & Dock Timer Control
       this.jumperTime = 0;
@@ -107,16 +111,19 @@ define([
       }
     },
     targetsMove: function(){
-      var cont = 0;
+      var cont = 0,
+          indexTarget = 0,
+          timeInt = 0,
+          positionY = 0;
       do{
-        var indexTarget = Math.floor(Math.random() * (this.targets.length));
-        var timeInt = (Math.random() * (this.confTargets.maxobstacleInterval - this.confTargets.minobstacleInterval + 1)) + this.confTargets.minobstacleInterval;
-        var positionY = (Math.random() * (240 - 160 + 1)) + 160;
+        indexTarget = Math.floor(Math.random() * (this.targets.length));
+        timeInt = (Math.random() * (this.confTargets.maxobstacleInterval - this.confTargets.minobstacleInterval + 1)) + this.confTargets.minobstacleInterval;
+        positionY = (Math.random() * (240 - 160 + 1)) + 160;
         cont++;
       }while( this.targets[indexTarget].status === 'active' &&  cont < this.targets.length);
 
       var self = this;
-      setTimeout(function(){
+      this.targetsMoveTimeout = setTimeout(function(){
         if( typeof(self.targets[indexTarget]) != 'undefined' ){
           self.targets[indexTarget].status = 'active';
           if( self.targets[indexTarget].type === 'random' ){
@@ -140,7 +147,43 @@ define([
         this.targets[elIndex].target.name = 'target'+elIndex;
         // Enable collision on the obstacle  
         this.game.physics.arcade.enable(this.targets[elIndex].target);
-      };
+      }
+    },
+    createPowerUps: function(){
+      this.powerUps = [];
+      this.powerUpsRandom = ['heart'];
+
+      for (var i = 0; i < this.powerUpsRandom.length; i++) {
+        var index = this.powerUps.push({
+          power: this.game.add.sprite(this.game.width, 0, this.powerUpsRandom[i]),
+          status: 'noactive',
+          type: 'random'
+        })-1;
+        this.powerUpGroup.add(this.powerUps[index].power);
+        // Enable collision on the obstacle
+        this.game.physics.arcade.enable(this.powerUps[index].power);
+      }
+    },
+    powerUpMove: function(){
+      var cont = 0,
+          index = 0,
+          timeInt = 0,
+          positionY = 0;
+      do{
+        index = Math.floor(Math.random() * (this.powerUps.length));  
+        timeInt = (Math.random() * (this.confPower.maxobstacleInterval - this.confPower.minobstacleInterval + 1)) + this.confPower.minobstacleInterval;
+        positionY = (Math.random() * (240 - 160 + 1)) + 160;
+        cont++;
+      }while( this.powerUps[index].status === 'active' &&  cont < this.powerUps.length);
+
+      var self = this;
+      this.powerUpMoveTimeout = setTimeout(function(){
+        self.powerUps[index].status = 'active';
+        if( self.powerUps[index].type === 'random' ){
+          self.powerUps[index].power.y = positionY;
+        }
+        self.powerUpMove();
+      }, timeInt);
     },
     createBlocks: function(){
 
@@ -187,11 +230,10 @@ define([
         // Physics enabled for ground to work as floor
         this.game.physics.arcade.enable(this.blocks[elIndex].block);
         this.blocks[elIndex].block.body.immovable = true;
-      };
+      }
       
       for (var i = 0; i < this.blocksFixed.length; i++) {
 
-          this.blocksFixed[i];
           var elIndex = this.blocks.push({
             block: this.game.add.sprite(this.game.width, this.blocksFixed[i].pos, this.blocksFixed[i].block), 
             status: 'noactive', 
@@ -204,7 +246,7 @@ define([
           // Physics enabled for ground to work as floor
           this.game.physics.arcade.enable(this.blocks[elIndex].block);
           this.blocks[elIndex].block.body.immovable = true;
-      };
+      }
     },
     blocksSetMovement: function(){
       var timeInt = (Math.random() * (this.confBlocks.maxobstacleInterval - this.confBlocks.minobstacleInterval + 1)) + this.confBlocks.minobstacleInterval;
@@ -212,7 +254,7 @@ define([
       
       var self = this;
 
-      setTimeout(function(){
+      this.blocksSetMovementTimeout = setTimeout(function(){
         self.blocks[indexBlock].status = 'active';
 
         if( self.blocks[indexBlock].type === 'pattern' ){
@@ -233,7 +275,7 @@ define([
                               },
                               {
                                 obstacle:'snail', 
-                                pos: 242, 
+                                pos: 252, 
                                 speed: 1.5
                               }];
 
@@ -247,7 +289,7 @@ define([
                             animationSpeed: 7,
                             animationLoop: true,
                           }];
-      this.obstacles = []
+      this.obstacles = [];
 
       for (var i = 0; i < this.obstaclesAnim.length; i++) {
         var elIndex = this.obstacles.push({obstacle: this.game.add.sprite(this.game.width, this.obstaclesAnim[i].pos, this.obstaclesAnim[i].obstacle), 
@@ -263,7 +305,7 @@ define([
         this.damagingGroup.add(this.obstacles[elIndex].obstacle);
         // Enable collision on the obstacle  
         this.game.physics.arcade.enable(this.obstacles[elIndex].obstacle);
-      };
+      }
 
       for (var i = 0; i < this.obstaclesRandom.length; i++) {
         var elIndex = this.obstacles.push({
@@ -274,7 +316,7 @@ define([
         this.damagingGroup.add(this.obstacles[elIndex].obstacle);
         // Enable collision on the obstacle  
         this.game.physics.arcade.enable(this.obstacles[elIndex].obstacle);
-      };
+      }
 
       for (var i = 0; i < this.obstaclesFixedPos.length; i++) {
         var elIndex = this.obstacles.push({
@@ -287,22 +329,25 @@ define([
         this.damagingGroup.add(this.obstacles[elIndex].obstacle);
         // Enable collision on the obstacle  
         this.game.physics.arcade.enable(this.obstacles[elIndex].obstacle);
-      };
+      }
     },
     obstaclesAssignProb: function(){
-
+      // TODO: Control Probability on the obstacles and targets
     },
     obstaclesSetTimeMove: function(){
-      var cont = 0;
+      var cont = 0,
+          indexObstacle = 0,
+          timeInt = 0,
+          positionY = 0;
       do{
-        var indexObstacle = Math.floor(Math.random() * (this.obstacles.length));  
-        var timeInt = (Math.random() * (this.confObstacles.maxobstacleInterval - this.confObstacles.minobstacleInterval + 1)) + this.confObstacles.minobstacleInterval;
-        var positionY = (Math.random() * (240 - 160 + 1)) + 160;
+        indexObstacle = Math.floor(Math.random() * (this.obstacles.length));  
+        timeInt = (Math.random() * (this.confObstacles.maxobstacleInterval - this.confObstacles.minobstacleInterval + 1)) + this.confObstacles.minobstacleInterval;
+        positionY = (Math.random() * (240 - 160 + 1)) + 160;
         cont++;
       }while( this.obstacles[indexObstacle].status === 'active' &&  cont < this.obstacles.length);
 
       var self = this;
-      setTimeout(function(){
+      this.obstaclesSetTimeMoveTimeout = setTimeout(function(){
         self.obstacles[indexObstacle].status = 'active';
         if( self.obstacles[indexObstacle].type === 'random' ){
           self.obstacles[indexObstacle].obstacle.y = positionY;
@@ -311,6 +356,9 @@ define([
       }, timeInt);
     },
     create: function() {
+      
+      // Running game flag
+      this.gameIsRunning = true;
 
       this.createWorld();
       this.createEnegyLevel();
@@ -318,6 +366,7 @@ define([
       this.createBlocks();
       this.createTargets();
       this.createTargetsScore();
+      this.createPowerUps();
       this.createPlayer();
 
       // Starts moving the obstacles
@@ -328,6 +377,9 @@ define([
 
       // Starts moving the targets
       this.targetsMove();
+
+      // Starts Power movement
+      this.powerUpMove();
 
       // Enables Cursor control for the player
       this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -370,9 +422,41 @@ define([
     playerHurted: function(){
       this.energyBarText.text -= 1;
       this.energyBar.scale.x = (this.energyBarText.text/100);
+      if( parseInt(this.energyBarText.text) < 0){
+        this.energyBarText.text = 0;
+        this.energyBar.scale.x = 0;
+      }
+    },
+    restartGame: function(){
+      this.game.state.start('Game');    
     },
     endOfGame: function(){
-      // TODO: clear timeIntervals
+      this.player.animations.stop();
+      clearTimeout(this.targetsMoveTimeout);
+      clearTimeout(this.obstaclesSetTimeMoveTimeout);
+      clearTimeout(this.powerUpMoveTimeout);
+      clearTimeout(this.blocksSetMovementTimeout);
+      this.gameIsRunning = false;
+
+      for (var i = 0; i < this.obstacles.length; i++) {
+        if(this.obstacles[i].type === 'animated'){
+          this.obstacles[i].obstacle.animations.stop();
+        }
+      }
+
+      this.buttonRestart = this.game.add.button(this.game.world.centerX - 81, this.game.world.centerY - 30, 'restart', this.restartGame, this, 2, 1, 0);
+    },
+    playerHitPower: function(player, power){
+      
+      this.energyBarText.text = (parseInt(this.energyBarText.text)+20) > 100 ? 100 : (parseInt(this.energyBarText.text)+20);
+      this.energyBar.scale.x = (this.energyBarText.text/100);
+
+      for (var i = 0; i < this.powerUps.length; i++) {
+        if( this.powerUps[i].power.key === power.key ){
+          this.powerUps[i].status = 'noactive';
+          this.powerUps[i].power.x = -this.powerUps[i].power.width;
+        }
+      }
     },
     playerHitTarget: function(player, target){
       for (var i = 0; i < this.targetsScore.length; i++) {
@@ -380,92 +464,108 @@ define([
           this.game.add.sprite(this.targetsScore[i].x, this.targetsScore[i].y, 'check');
           break;
         }
-      };
+      }
 
       // Remove it from the targets list so it wont be displayed again
-
       for (var i = 0; i < this.targets.length; i++) {
         if(this.targets[i].target.key === target.key){
           this.targets[i].target.destroy();
           this.targets.splice(i, 1);
           break;
         }
-      };
+      }
     },
     update: function() {
-      this.game.physics.arcade.collide(this.player, this.groundGroup, this.playerRunning, null, this);
-      this.game.physics.arcade.overlap(this.player, this.damagingGroup, this.playerHurted, null, this);
-      this.game.physics.arcade.overlap(this.player, this.targetGroup, this.playerHitTarget, this.tmp, this);
 
-      // Jump Detection & dock detection
-      if(this.cursors.up.isDown) {
-        this.playerJump();
-      }else if(this.cursors.down.isDown){
-        this.playerdock();
-      }
+      if(this.gameIsRunning){
 
-      this.ground.tilePosition.x -= 1.5;
-      this.backgroundCity.tilePosition.x -= 0.1;
-      this.backgroundForest.tilePosition.x -= 0.2;
+        this.game.physics.arcade.collide(this.player, this.groundGroup, this.playerRunning, null, this);
+        this.game.physics.arcade.overlap(this.player, this.damagingGroup, this.playerHurted, null, this);
+        this.game.physics.arcade.overlap(this.player, this.targetGroup, this.playerHitTarget, null, this);
+        this.game.physics.arcade.overlap(this.player, this.powerUpGroup, this.playerHitPower, null, this);
 
-      // If energy is over
-      if(this.energyBarText.text <= 0) {
-        // this.game.state.start('Game');
-      }
-
-      /*if(this.blockWood.x < -this.blockWood.width) {
-        this.blockWood.body.x = this.game.width;
-      }*/
-
-      // Move Active Blocks
-      for (var i = 0; i < this.blocks.length; i++) {
-        if( this.blocks[i].status === 'active' ){
-          this.blocks[i].block.x -= this.blocks[i].speed;
+        // Jump Detection & dock detection
+        if(this.cursors.up.isDown) {
+          this.playerJump();
+        }else if(this.cursors.down.isDown){
+          this.playerdock();
         }
 
-        if(this.blocks[i].block.x < -this.blocks[i].block.width) {
-          this.blocks[i].status = 'noactive';
-          this.blocks[i].block.x = this.game.width;
+        this.ground.tilePosition.x -= 1.5;
+        this.backgroundCity.tilePosition.x -= 0.1;
+        this.backgroundForest.tilePosition.x -= 0.2;
+
+        // If energy is over
+        if(this.energyBarText.text <= 0) {
+          this.endOfGame();
         }
-      };
 
-      // Move Active obstacles
-      for (var i = 0; i < this.obstacles.length; i++) {
-        if( this.obstacles[i].status === 'active' ){
+        /*if(this.blockWood.x < -this.blockWood.width) {
+          this.blockWood.body.x = this.game.width;
+        }*/
 
-          if( this.obstacles[i].type === 'fixed' ){
-            this.obstacles[i].obstacle.x -= this.obstacles[i].speed;
-          }else if( this.obstacles[i].type === 'animated' ){
-            this.obstacles[i].obstacle.x -= this.obstacles[i].speed;
-          }else{
-            this.obstacles[i].obstacle.x -= 3.5;
+        // Move Active Blocks
+        for (var i = 0; i < this.blocks.length; i++) {
+          if( this.blocks[i].status === 'active' ){
+            this.blocks[i].block.x -= this.blocks[i].speed;
+          }
+
+          if(this.blocks[i].block.x < -this.blocks[i].block.width) {
+            this.blocks[i].status = 'noactive';
+            this.blocks[i].block.x = this.game.width;
           }
         }
 
-        if(this.obstacles[i].obstacle.x < -40) {
-          this.obstacles[i].status = 'noactive';
-          this.obstacles[i].obstacle.x = this.game.width;
-        }
-      };
+        // Move Active obstacles
+        for (var i = 0; i < this.obstacles.length; i++) {
+          if( this.obstacles[i].status === 'active' ){
 
-      // Move Active Targets
-      for (var i = 0; i < this.targets.length; i++) {
-        if( this.targets[i].status === 'active' ){
+            if( this.obstacles[i].type === 'fixed' ){
+              this.obstacles[i].obstacle.x -= this.obstacles[i].speed;
+            }else if( this.obstacles[i].type === 'animated' ){
+              this.obstacles[i].obstacle.x -= this.obstacles[i].speed;
+            }else{
+              this.obstacles[i].obstacle.x -= 3.5;
+            }
+          }
 
-          if( this.targets[i].type === 'fixed' ){
-            this.targets[i].target.x -= this.targets[i].speed;
-          }else if( this.targets[i].type === 'animated' ){ //console.log('animated');
-            this.targets[i].target.x -= this.targets[i].speed;
-          }else{
-            this.targets[i].target.x -= 3;
+          if(this.obstacles[i].obstacle.x < -40) {
+            this.obstacles[i].status = 'noactive';
+            this.obstacles[i].obstacle.x = this.game.width;
           }
         }
 
-        if( this.targets[i].target.x < -(40)) {
-          this.targets[i].status = 'noactive';
-          this.targets[i].target.x = this.game.width;
+        // Move Active Targets
+        for (var i = 0; i < this.targets.length; i++) {
+          if( this.targets[i].status === 'active' ){
+
+            if( this.targets[i].type === 'fixed' ){
+              this.targets[i].target.x -= this.targets[i].speed;
+            }else if( this.targets[i].type === 'animated' ){ //console.log('animated');
+              this.targets[i].target.x -= this.targets[i].speed;
+            }else{
+              this.targets[i].target.x -= 3;
+            }
+          }
+
+          if( this.targets[i].target.x < -(40)) {
+            this.targets[i].status = 'noactive';
+            this.targets[i].target.x = this.game.width;
+          }
         }
-      };
+
+        // Move Active Powerups
+        for (var i = 0; i < this.powerUps.length; i++) {
+          if( this.powerUps[i].status === 'active' ){
+            this.powerUps[i].power.x -= 3.5;
+          }
+
+          if(this.powerUps[i].power.x < -40) {
+            this.powerUps[i].status = 'noactive';
+            this.powerUps[i].power.x = this.game.width;
+          }
+        }
+      }
     }
   };
 

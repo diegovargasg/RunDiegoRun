@@ -1,7 +1,7 @@
 define([
   'phaser',
 ], function (phaser) {
-
+  'use strict';
 
   var BootState = function (game) {};
 
@@ -11,7 +11,7 @@ define([
       this.load.image('preloadbar', 'assets/images/preloader-bar.png');
     },
     create: function() {
-      this.game.stage.backgroundColor = '#fff';
+      this.game.stage.backgroundColor = '#000';
 
       //scaling options
       this.scale.scaleMode = Phaser.ScaleManager.NONE;

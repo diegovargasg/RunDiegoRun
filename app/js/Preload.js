@@ -1,7 +1,8 @@
 define([
   'phaser',
 ], function (phaser) {
-
+  'use strict';
+  
   var PreloadState = function (game) {};
 
   PreloadState.prototype = {
@@ -20,6 +21,7 @@ define([
       this.load.image('background-city', 'assets/images/background-city.png');
       this.load.image('background-forest', 'assets/images/background-forest.png');
       this.load.image('heart', 'assets/images/heart.png');
+      this.load.image('restart', 'assets/images/button-restart.png');
       this.load.image('energy-bar', 'assets/images/energy-bar.png');
 
       //////

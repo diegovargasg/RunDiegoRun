@@ -59,6 +59,9 @@ module.exports = function(grunt) {
 		    }]
 	    }	
 	  },
+	  jshint: {
+	    all: ['app/js/*.js']
+	  },
 	  requirejs: {
 		  compile: {
 		    options: {
@@ -67,7 +70,7 @@ module.exports = function(grunt) {
           mainConfigFile: "app/js/main.js",
           name: '../../bower_components/almond/almond',
           include: 'main',
-          optimize: 'none'
+          // optimize: 'none'
 		    }
 		  }
 		}
@@ -83,6 +86,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-requirejs');
 	grunt.loadNpmTasks('grunt-contrib-imagemin');
+	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-build-control');
 
 	// Not implemented yet
