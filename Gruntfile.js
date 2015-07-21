@@ -1,7 +1,20 @@
 module.exports = function(grunt) {
 	
 	grunt.initConfig({
-
+		buildcontrol: {
+	    options: {
+	      dir: 'dist',
+	      commit: true,
+	      push: true,
+	      message: 'Built %sourceName% from commit %sourceCommit% on branch %sourceBranch%'
+	    },
+	    pages: {
+	      options: {
+	        remote: 'https://github.com/diegovargasg/rundiegorun.git',
+	        branch: 'gh-pages'
+	      }
+	    }
+    },
 	  htmlmin: {                                     // Task 
 	    dist: {                                      // Target 
 	      options: {                                 // Target options 
@@ -70,6 +83,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-connect');
 	grunt.loadNpmTasks('grunt-contrib-requirejs');
 	grunt.loadNpmTasks('grunt-contrib-imagemin');
+	grunt.loadNpmTasks('grunt-build-control');
 
 	// Not implemented yet
 	grunt.loadNpmTasks('grunt-contrib-concat');
