@@ -17,8 +17,8 @@ define([
       this.game.time.advancedTiming = true;
       this.confObstacles = {minobstacleInterval: 2500, maxobstacleInterval: 4500};
       this.confBlocks = {minobstacleInterval: 10000, maxobstacleInterval: 15000};
-      // this.confTargets = {minobstacleInterval: 15000, maxobstacleInterval: 30000};
-      this.confTargets = {minobstacleInterval: 5000, maxobstacleInterval: 10000};
+      this.confTargets = {minobstacleInterval: 15000, maxobstacleInterval: 30000};
+      // this.confTargets = {minobstacleInterval: 5000, maxobstacleInterval: 10000};
       this.confPower = {minobstacleInterval: 15000, maxobstacleInterval: 30000};
 
       // Background Group - Controles z-indexing as well
@@ -290,6 +290,26 @@ define([
                             animationFrame: [0, 1, 2],
                             animationSpeed: 7,
                             animationLoop: true,
+                          },
+                          {
+                            obstacle:'witch', 
+                            pos: 100, 
+                            speed: 2.7,
+                            scale: 0.9,
+                            animationName: 'animation',
+                            animationFrame: [0, 1, 2],
+                            animationSpeed: 5,
+                            animationLoop: true,
+                          },
+                          {
+                            obstacle:'robot', 
+                            pos: 227, 
+                            speed: 2.3,
+                            scale: 0.6,
+                            animationName: 'animation',
+                            animationFrame: [0, 1, 2, 3, 4, 5, 6, 7],
+                            animationSpeed: 5,
+                            animationLoop: true,
                           }];
       this.obstacles = [];
 
@@ -302,7 +322,7 @@ define([
                         })-1;
 
         this.obstacles[elIndex].obstacle.scale.set(this.obstaclesAnim[elIndex].scale);
-        this.obstacles[elIndex].obstacle.animations.add('animation', [0, 1, 2], this.obstaclesAnim[elIndex].animationSpeed, this.obstaclesAnim[elIndex].animationLoop);
+        this.obstacles[elIndex].obstacle.animations.add('animation', this.obstaclesAnim[elIndex].animationFrame, this.obstaclesAnim[elIndex].animationSpeed, this.obstaclesAnim[elIndex].animationLoop);
         this.obstacles[elIndex].obstacle.animations.play('animation');
         this.damagingGroup.add(this.obstacles[elIndex].obstacle);
         // Enable collision on the obstacle  

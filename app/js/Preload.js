@@ -40,6 +40,8 @@ define([
       this.load.image('block-wood', 'assets/images/block-wood.png');
       this.load.image('heart', 'assets/images/heart.png', 40, 40);
       this.load.spritesheet('sheep', 'assets/images/sheep.png', 100, 62);
+      this.load.spritesheet('witch', 'assets/images/witch.png', 106, 73);
+      this.load.spritesheet('robot', 'assets/images/robot.png', 77, 89);
     },
     create: function() {
       this.state.start('Game');
