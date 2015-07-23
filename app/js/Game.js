@@ -17,7 +17,8 @@ define([
       this.game.time.advancedTiming = true;
       this.confObstacles = {minobstacleInterval: 2500, maxobstacleInterval: 4500};
       this.confBlocks = {minobstacleInterval: 10000, maxobstacleInterval: 15000};
-      this.confTargets = {minobstacleInterval: 15000, maxobstacleInterval: 30000};
+      // this.confTargets = {minobstacleInterval: 15000, maxobstacleInterval: 30000};
+      this.confTargets = {minobstacleInterval: 5000, maxobstacleInterval: 10000};
       this.confPower = {minobstacleInterval: 15000, maxobstacleInterval: 30000};
 
       // Background Group - Controles z-indexing as well
@@ -431,8 +432,8 @@ define([
     restartGame: function(){
       this.game.state.start('Game');    
     },
-    endOfGame: function(){
-      var text = this.game.add.text(this.game.world.centerX, this.game.world.centerY-65, 'You\'ve lost.');
+    endOfGame: function(msg){
+      var text = this.game.add.text(this.game.world.centerX, this.game.world.centerY-65, msg);
 
       //  Center align
       text.anchor.set(0.5);
@@ -486,7 +487,6 @@ define([
       // Remove it from the targets list so it wont be displayed again
       for (var i = 0; i < this.targets.length; i++) {
         if(this.targets[i].target.key === target.key){
-          console.log(this.targets[i].desc);
 
           var text = this.game.add.text(this.game.world.centerX, this.game.world.centerY-65, this.targets[i].desc);
 
@@ -510,6 +510,10 @@ define([
 
           this.targets[i].target.destroy();
           this.targets.splice(i, 1);
+
+          if( this.targets.length === 0 ){
+            this.endOfGame('You\'ve won');
+          }
           break;
         }
       }
@@ -536,7 +540,7 @@ define([
 
         // If energy is over
         if(this.energyBarText.text <= 0) {
-          this.endOfGame();
+          this.endOfGame('You\'ve lost.');
         }
 
         /*if(this.blockWood.x < -this.blockWood.width) {
