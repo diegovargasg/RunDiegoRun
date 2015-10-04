@@ -62,6 +62,33 @@ module.exports = function(grunt) {
 	  jshint: {
 	    all: ['app/js/*.js']
 	  },
+	  sprite:{
+      all: {
+        src: 'app/assets/png/*.png',
+        dest: 'app/assets/png/spritesheet.png',
+        destCss: 'app/assets/png/sprites.css',
+        cssTemplate: 'app/assets/png/handlebarsStr.css.handlebars'
+      }
+    },
+    cmq: {
+	    options: {
+	      log: false
+	    },
+	    your_target: {
+	      files: {
+	        'dist/css/': ['app/css/*.css']
+	      }
+	    }
+  	},
+  	cssmin: {
+		  dist: {
+        files: {
+          'dist/css/main.min.css': [
+            'app/css/*.css'
+          ]
+        }
+      }
+		},
 	  requirejs: {
 		  compile: {
 		    options: {
@@ -88,11 +115,15 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-imagemin');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-build-control');
+	grunt.loadNpmTasks('grunt-spritesmith');
+	grunt.loadNpmTasks('grunt-combine-media-queries');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 
 	// Not implemented yet
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-uncss');
 
 	grunt.registerTask('default', ['htmlmin']);
 	grunt.registerTask('build', ['clean', 'htmlmin', 'imagemin', 'requirejs']);
